@@ -1,0 +1,7 @@
+Eda Tool Option -> ModelSim-Altera
+	:C:\intelFPGA_lite\18.1\modelsim_ase\win32aloem
+
+
+Git config:
+	$ git config --global user.name "XXXX"
+	$ git config --global user.email XX@XX.X
