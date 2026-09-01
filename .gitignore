@@ -1,0 +1,14 @@
+# Pastas — em qualquer diretório/subdiretório
+**/board/
+**/db/
+**/incremental_db/
+**/output_files/
+**/simulation/
+**/timing/
+
+# Arquivos — em qualquer diretório/subdiretório
+**/*.abk
+**/*.json
+**/*.qdf
+**/*.rpt
+**/*.bak
