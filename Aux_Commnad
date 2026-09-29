@@ -1,6 +1,7 @@
 Eda Tool Option -> ModelSim-Altera
 	:C:\intelFPGA_lite\18.1\modelsim_ase\win32aloem
 
+Assignments -> Setting -> Simulation -> NativeLink: Compile test bench.
 
 Git config:
 	$ git config --global user.name "XXXX"
