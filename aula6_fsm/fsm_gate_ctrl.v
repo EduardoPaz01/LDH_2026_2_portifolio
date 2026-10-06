@@ -70,10 +70,10 @@ module fsm_gate_ctrl(
 	
 	assign motor_power = 
 		(state == `STATE_CLOSING || state == `STATE_OPENING) ? 
-		1b'1: 1b'0;
+		1'b1: 1'b0;
 		
 	assign motor_direction = 
 		(state == `STATE_OPENING) ? 
-		1b'1: 1b'0;
+		1'b1: 1'b0;
 
 endmodule
