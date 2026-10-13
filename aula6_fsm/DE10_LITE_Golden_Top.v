@@ -127,13 +127,68 @@ module DE10_LITE_Golden_Top(
 //  REG/WIRE declarations
 //=======================================================
 
+	 wire clk_1s_w;
+    wire button_press;
+    wire button_release;
 
+    wire start_stop_w;
+    wire end_stop_w;
+
+    wire motor_power_w;
+    wire motor_direction_w;
+
+    wire [9:0] led_bar;
 
 
 //=======================================================
 //  Structural coding
 //=======================================================
 
+	clk_1s u1(
+		.rst(~KEY[0]),
+		.clk_50M(MAX10_CLK1_50),
+		.clk_out(clk_1s_w)
+	);
+	
+	edge_detector u_edge_detector (
+        .clk         (clk_1s_w),
+        .rst         (KEY[0]),
+        .button      (KEY[1]),
+        .but_press   (button_press),
+        .but_release (button_release)
+    );
 
+	fsm_gate_ctrl u_fsm_gate_ctrl (
+        .clk             (clk_1s_w),
+        .rst             (~KEY[0]),
+        .user_button     (button_press),
+        .start_stop      (start_stop_w),
+        .end_stop        (end_stop_w),
+        .motor_power     (motor_power_w),
+        .motor_direction (motor_direction_w)
+    );
+	 
+	 gate_counter u_gate_counter (
+        .clk        (clk_1s_w),
+        .rst        (~KEY[0]),
+        .dir        (motor_direction_w),
+        .enable     (motor_power_w & SW[0]),
+        .start_stop (start_stop_w),
+        .end_stop   (end_stop_w),
+        .led_bar    (led_bar)
+    );
+	 
+	 assign LEDR = led_bar;
+
+    // HEX0: indica motor ligado
+    // HEX1: indica sentido de abertura
+    // Displays ativos em nível baixo
+    assign HEX0 = motor_power_w     ? 8'b10001100 : 8'b11111111;
+    assign HEX1 = motor_direction_w ? 8'b10001100 : 8'b11111111;
+
+    assign HEX2 = 8'b11111111;
+    assign HEX3 = 8'b11111111;
+    assign HEX4 = 8'b11111111;
+    assign HEX5 = 8'b11111111;
 
 endmodule
