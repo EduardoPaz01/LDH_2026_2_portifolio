@@ -4,5 +4,5 @@ Eda Tool Option -> ModelSim-Altera
 Assignments -> Setting -> Simulation -> NativeLink: Compile test bench.
 
 Git config:
-	$ git config --global user.name "XXXX"
-	$ git config --global user.email XX@XX.X
+	$ git config --global user.name "EduardoPaz01"
+	$ git config --global user.email eduardopazputti@gmail.com
