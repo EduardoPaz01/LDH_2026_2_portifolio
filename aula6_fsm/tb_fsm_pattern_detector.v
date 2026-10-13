@@ -1,4 +1,4 @@
-`timescale 1us/1us
+`timescale 1ps/1ps
 
 module tb_fsm_pattern_detector;
 
@@ -23,7 +23,7 @@ module tb_fsm_pattern_detector;
         rst = 1;
         in_bit = 0;
 
-        #1;
+        #2;
         rst = 0;
 
         #2 in_bit = 0;
