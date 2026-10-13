@@ -1,78 +1,49 @@
-`define S0 0
-`define S1 1
-`define S2 2
-`define S3 3
-`define S4 4
+`define S0 3'd0
+`define S1 3'd1
+`define S2 3'd2
+`define S3 3'd3
+`define S4 3'd4
 
 module fsm_pattern_detector (
-	input rst,
-	input clk,
-	
-	// Sinais de controle
-	input in_bit,
-	
-	// Sinal de saída
-	output match
+    input  wire rst,
+    input  wire clk,
+
+    // Sinal de entrada
+    input  wire in_bit,
+
+    // Sinal de saída
+    output wire match
 );
 
-	reg [2:0] state;// [S0, S1, S2, S3, S4]
-	reg [2:0] nextstate;
-	
-	//Motor de estados
-	
-	//always @(posedge clk or posedge rst) begin
-	//	if(rst) begin // reset assíncrono
-	//		state <= STATE_CLOSED;
-	//	end else begin
-	//		state <= nextstate;
-	//	end
-	//end
-	always @(posedge clk) begin
-		if(rst) begin // reset síncrono
-			state <= `S0; // "<=" transição não bloqueante, só sofre definição no final do ciclo, não há multiplas definições
-		end else begin
-			state <= nextstate;
-		end
-	end
-	
-	
-	//Lógica de transição (bloco assíncrono)
-	
-	always @(*) begin
-		case(state)
-			`S0: begin
-				if(in_bit == 1'b0) nextstate = `S0; 
-				else               nextstate = `S1;
-			end
-			
-			`S1: begin
-				if(in_bit == 1'b0) nextstate = `S0; 
-				else               nextstate = `S2;
-			end
-			
-			`S2: begin
-				if(in_bit == 1'b0) nextstate = `S3; 
-				else               nextstate = `S1;
-			end
-			
-			`S3: begin
-				if(in_bit == 1'b0) nextstate = `S0; 
-				else               nextstate = `S4;
-			end
-			
-			`S4: begin
-				if(in_bit == 1'b0) nextstate = `S4; 
-				else               nextstate = `S4;
-			end
-					
-		endcase
-	end
-	
-	
-	//Lógica de saída (bloco assíncrono)
-	
-	assign match = 
-		(state == `S4) ? 
-		1'b1: 1'b0;
+    reg [2:0] state;
+    reg [2:0] nextstate;
 
-endmodule
+    // Registrador de estado: reset síncrono
+    always @(posedge clk) begin
+        if (rst) begin
+            state <= `S0;
+        end else begin
+            state <= nextstate;
+        end
+    end
+
+    // Lógica combinacional de transição
+    always @(*) begin
+        // Valor padrão para evitar latches
+        nextstate = `S0;
+
+        case (state)
+            `S0: nextstate = in_bit ? `S1 : `S0;
+            `S1: nextstate = in_bit ? `S2 : `S0;
+            `S2: nextstate = in_bit ? `S2 : `S3;
+            `S3: nextstate = in_bit ? `S4 : `S0;
+            `S4: nextstate = `S4;
+
+            default: nextstate = `S0;
+        endcase
+    end
+
+    // Lógica combinacional de saída
+    assign match = (state == `S4);
+	 
+endmodule 
