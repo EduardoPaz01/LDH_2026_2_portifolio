@@ -6,67 +6,117 @@
 `define STATE_GREEN 			3'd5
 
 module semaforo_fsm (
-	input			 rst,
-	input 		 clk,
+    input wire rst,
+    input wire clk,
 
-	// Sinais de controle indo para o datapagth
-	output reg [1:0] sel,
-	output reg		 clear,
-	
-	// Sinais de estado vindo do datapagth
-	input			 top,
-	
-	// Saídas de controle para o dispositivo
-	output reg [2:0] lights
+	 // Sinais de controle indo para o datapagth
+    output reg [1:0] sel,
+    output reg clear,
+
+	 // Sinais de estado vindo do datapagth
+    input wire top,
+
+	 // Sai­das de controle para o dispositivo
+    output reg [2:0] lights
 );
 
-	reg [2:0] state;
-	reg [2:0] next_state;
+    reg [2:0] state;
+    reg [2:0] next_state;
 
-	// Motor de estados
-	always @(posedge clk) begin
-		if(rst) state <= `STATE_RED_LOAD;
-		else state <= next_state;
-	end
-	
-	// Lógica do próximo estado
-	always @(*) begin
-		case (state)
-			`STATE_RED_LOAD: next_state = `STATE_RED;
-			`STATE_RED: next_state = (top) ? `STATE_GREEN_LOAD : `STATE_RED;
-			
-			`STATE_GREEN_LOAD: next_state = `STATE_GREEN;
-			`STATE_GREEN: next_state = (top) ? `STATE_YELLOW_LOAD : `STATE_GREEN;
-			
-			`STATE_YELLOW_LOAD: next_state = `STATE_YELLOW;
-			`STATE_YELLOW: next_state = (top) ? `STATE_RED_LOAD : `STATE_RED;
-			
-			default: next_state = `STATE_RED_LOAD;
-		endcase
-	end
-	
-	// Lógica de saída
-	always @(*) begin
-		clear = 0;
-		case(state)
-			`STATE_RED_LOAD: clear = 1;
-			`STATE_RED: begin
-				lights = 3'b100;
-				sel = 2'd0;
-			end
-			
-			`STATE_GREEN_LOAD: clear = 1;
-			`STATE_GREEN: begin
-				lights = 3'b001;
-				sel = 2'd1;
-			end
-			
-			`STATE_YELLOW_LOAD: clear = 1;
-			`STATE_YELLOW: begin
-				lights = 3'b010;
-				sel = 2'd2;
-			end
-		endcase
-	end
+    // Registrador de estado
+    always @(posedge clk) begin
+        if (rst) state <= `STATE_RED_LOAD;
+        else state <= next_state;
+    end
 
+    // Logica de proximo estado
+    always @(*) begin
+        next_state = `STATE_RED_LOAD;
+
+        case (state)
+
+            `STATE_RED_LOAD: next_state = `STATE_RED;
+
+            `STATE_RED: begin
+                if (top) next_state = `STATE_GREEN_LOAD;
+                else next_state = `STATE_RED;
+            end
+
+            `STATE_GREEN_LOAD: next_state = `STATE_GREEN;
+
+            `STATE_GREEN: begin
+                if (top) next_state = `STATE_YELLOW_LOAD;
+                else next_state = `STATE_GREEN;
+            end
+
+            `STATE_YELLOW_LOAD: next_state = `STATE_YELLOW;
+
+            `STATE_YELLOW: begin
+                if (top) next_state = `STATE_RED_LOAD;
+                else next_state = `STATE_YELLOW;
+            end
+
+            default: next_state = `STATE_RED_LOAD;
+
+        endcase
+    end
+
+    // Logica das saidas
+    always @(*) begin
+
+        // Valores padrao
+        clear = 1'b0;
+        sel = 2'd0;
+        lights = 3'b100;
+
+        case (state)
+
+            // Preparacao do vermelho
+            `STATE_RED_LOAD: begin
+                clear = 1'b1;
+                sel = 2'd0;
+                lights = 3'b100;
+            end
+
+            // Vermelho ativo
+            `STATE_RED: begin
+                sel = 2'd0;
+                lights = 3'b100;
+            end
+
+            // Preparacao do verde
+            `STATE_GREEN_LOAD: begin
+                clear = 1'b1;
+                sel = 2'd1;
+                lights = 3'b001;
+            end
+
+            // Verde ativo
+            `STATE_GREEN: begin
+                sel = 2'd1;
+                lights = 3'b001;
+            end
+
+            // Preparacao do amarelo
+            `STATE_YELLOW_LOAD: begin
+                clear = 1'b1;
+                sel = 2'd2;
+                lights = 3'b010;
+            end
+
+            // Amarelo ativo
+            `STATE_YELLOW: begin
+                sel = 2'd2;
+                lights = 3'b010;
+            end
+
+            default: begin
+                clear = 1'b1;
+                sel = 2'd0;
+                lights = 3'b100;
+            end
+
+        endcase
+    end
+ 
 endmodule 

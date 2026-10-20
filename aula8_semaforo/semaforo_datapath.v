@@ -19,15 +19,15 @@ module semaforo_datapath(
 	);
 	
 	// Comparador de match de contagem
-	assign top = (cnt == sel_time);
+	assign top = (cnt >= sel_time);
 	
 	// Multiplexador para seleção de tempo
 	always @(*) begin
 		case (sel)
-			0: sel_time = 20;
-			1: sel_time = 2;
-			2: sel_time = 10;
-			default: sel_time = 31;
+			2'd0: sel_time = 5'd3;  // Vermelho
+			2'd1: sel_time = 5'd2;  // Verde
+			2'd2: sel_time = 5'd3;  // Amarelo
+			default: sel_time = 5'd31;
 		endcase 
 	end
 
