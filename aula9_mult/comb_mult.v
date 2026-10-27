@@ -1,39 +1,45 @@
-module comb_mult (
-    input  [3:0] a,
-    input  [3:0] b,
-    output [7:0] m
+module comb_mult #(
+    parameter A_BITS = 4,
+    parameter B_BITS = 4,
+    parameter M_BITS = A_BITS + B_BITS
+)(
+    input  [A_BITS-1:0] a,
+    input  [B_BITS-1:0] b,
+    output [M_BITS-1:0] m
 );
 
-    wire [6:0] aw1, aw2, aw3, aw4;
-    wire [7:0] sw1, sw2, sw3;
+    wire [M_BITS-1:0] pp  [0:B_BITS-1];
+    wire [M_BITS-1:0] acc [0:B_BITS-1];
 
-    // Produtos parciais
-    assign aw1 = b[0] ? {3'b000, a}       : 7'd0;
-    assign aw2 = b[1] ? {2'b00, a, 1'b0}  : 7'd0;
-    assign aw3 = b[2] ? {1'b0, a, 2'b00}  : 7'd0;
-    assign aw4 = b[3] ? {a, 3'b000}       : 7'd0;
+    genvar i;
 
-    // Soma dos produtos parciais 0 e 1
-    ripple_carry_adder s1 (
-        .a(aw1),
-        .b(aw2),
-        .s(sw1)
-    );
+    // Geração dos produtos parciais
+    generate
+        for (i = 0; i < B_BITS; i = i + 1) begin : partial
+            assign pp[i] = b[i]
+                ? ({{(M_BITS-A_BITS){1'b0}}, a} << i)
+                : {M_BITS{1'b0}};
+        end
+    endgenerate
 
-    // Soma do resultado anterior com o produto parcial 2
-    ripple_carry_adder s2 (
-        .a(sw1[6:0]),
-        .b(aw3),
-        .s(sw2)
-    );
+    // Primeira etapa: produto parcial sem soma
+    assign acc[0] = pp[0];
 
-    // Soma do resultado anterior com o produto parcial 3
-    ripple_carry_adder s3 (
-        .a(sw2[6:0]),
-        .b(aw4),
-        .s(sw3)
-    );
+    // Somar os produtos parciais com crescimento progressivo
+    generate
+        for (i = 1; i < B_BITS; i = i + 1) begin : stages
 
-    assign m = sw3;
+            ripple_carry_adder #(
+                .BITS(A_BITS + i + 1)
+            ) add_stage (
+                .a (acc[i-1][A_BITS+i-1:0]),
+                .b (pp[i][A_BITS+i-1:0]),
+                .s (acc[i][A_BITS+i:0])
+            );
 
-endmodule 
+        end
+    endgenerate
+
+    assign m = acc[B_BITS-1];
+
+endmodule
