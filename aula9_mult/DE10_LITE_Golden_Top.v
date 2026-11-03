@@ -144,7 +144,7 @@ module DE10_LITE_Golden_Top(
 		.a(SW[3:0]),
 		.b(SW[7:4]),
 		.m(produto),
-		.start(~KEY[0]),
+		.start(~KEY[1]),
 		.done(LEDR[0]),
 	);
 

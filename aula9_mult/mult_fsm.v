@@ -34,7 +34,7 @@ module mult_fsm(
 		case (state)	
 			`STATE_IDLE: next_state = (start) ? (`STATE_OP)   : (`STATE_IDLE);
 			`STATE_OP:   next_state = (zero)  ? (`STATE_DONE) : (`STATE_OP);
-			`STATE_DONE: next_state = (`STATE_IDLE);
+			`STATE_DONE: next_state = (`STATE_DONE);
 			default:     next_state = (`STATE_IDLE);
 		endcase
 	end
