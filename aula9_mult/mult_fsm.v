@@ -1,6 +1,6 @@
-'define STATE_IDLE 2'd0
-'define STATE_OP   2'd1
-'define STATE_DONE 2'd2
+`define STATE_IDLE 2'd0
+`define STATE_OP   2'd1
+`define STATE_DONE 2'd2
 
 module mult_fsm(
 	input rst,
@@ -31,9 +31,17 @@ module mult_fsm(
 	
 	// Lógica do próximo estado
 	always @(*) begin
-		
+		case (state)	
+			`STATE_IDLE: next_state = (start) ? (`STATE_OP)   : (`STATE_IDLE);
+			`STATE_OP:   next_state = (zero)  ? (`STATE_DONE) : (`STATE_OP);
+			`STATE_DONE: next_state = (`STATE_IDLE);
+			default:     next_state = (`STATE_IDLE);
+		endcase
 	end
 	
 	// Sinais de saída
+	 assign load  = (state == `STATE_IDLE);
+    assign clear = (state == `STATE_IDLE);
+    assign done  = (state == `STATE_DONE);
 
 endmodule 
