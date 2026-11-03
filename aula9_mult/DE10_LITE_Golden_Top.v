@@ -136,15 +136,21 @@ module DE10_LITE_Golden_Top(
 
 	// SW[3:0] = operando A
 	// SW[7:4] = operando B
-	comb_mult multiplicador (
-		 .a(SW[3:0]),
-		 .b(SW[7:4]),
-		 .m(produto)
+	
+	//comb_mult multiplicador (.a(SW[3:0]),.b(SW[7:4]),.m(produto));
+	seq_mult dut(
+		.clk(MAX10_CLK1_50),
+		.rst(~KEY[0]),
+		.a(SW[3:0]),
+		.b(SW[7:4]),
+		.m(produto),
+		.start(~KEY[0]),
+		.done(LEDR[0]),
 	);
 
 	// LEDs exibem o resultado binário
-	assign LEDR[7:0] = produto;
-	assign LEDR[9:8] = 2'b00;
+	//assign LEDR[7:0] = produto;
+	//assign LEDR[9:8] = 2'b00;
 
 	// Displays HEX mostram o produto em hexadecimal
 	hex_decoder dec0 (
