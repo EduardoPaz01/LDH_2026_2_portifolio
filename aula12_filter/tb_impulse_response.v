@@ -17,14 +17,32 @@ module tb_impulse_response;
         .x(x),
         .y(y)
     );
+	 
+	 integer f;
+	 
+	  // Monitoramento dos sinais no terminal
+		initial begin
+		  $monitor("t=%0t | rst=%b | clk=%b | x=%d | y=%d",
+					  $time, rst, clk, x, y);
+		end
+
+		// Gravação dos dados no arquivo CSV
+		always @(posedge clk) begin
+		  if (f != 0) begin
+				$fwrite(f, "%0t,%b,%b,%d,%d\n",
+						  $time, rst, clk, x, y);
+		  end
+		end
 
     // Estímulo de entrada
     initial begin
+		  f = $fopen("output.csv", "w");
+		  $fwrite(f, "tempo,rst,clk,x,y\n");
         clk = 1;
 		  rst = 1;
         x = 12'd0;
 
-        #15;
+        #16;
         rst = 0;
 
         // Aplicação do impulso
@@ -36,6 +54,7 @@ module tb_impulse_response;
         // Aguarda a resposta do filtro
         #50;
 
+		  $fclose(f);
         $finish;
     end
 
